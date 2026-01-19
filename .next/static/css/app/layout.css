@@ -629,6 +629,9 @@ video {
 .h-4 {
   height: 1rem;
 }
+.h-2 {
+  height: 0.5rem;
+}
 .max-h-32 {
   max-height: 8rem;
 }
@@ -754,6 +757,10 @@ video {
 .bg-japan-gold {
   --tw-bg-opacity: 1;
   background-color: rgb(255 215 0 / var(--tw-bg-opacity, 1));
+}
+.bg-japan-red {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 20 60 / var(--tw-bg-opacity, 1));
 }
 .p-12 {
   padding: 3rem;
@@ -1128,5 +1135,12 @@ body {
 
 .hover\:opacity-80:hover {
   opacity: 0.8;
+}
+
+@media (min-width: 768px) {
+
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 

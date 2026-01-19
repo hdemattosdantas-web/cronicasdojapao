@@ -128,6 +128,35 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
     }
   }
 
+  const handleCombatEnd = (result: any) => {
+    console.log('Combat result:', result)
+    // Aqui você pode atualizar o personagem baseado no resultado
+    if (result.playerInjured) {
+      // Adicionar efeito de ferimento
+      alert('Seu personagem sofreu ferimentos e precisará de descanso.')
+    }
+    if (result.playerGainedExperience) {
+      // Adicionar experiência
+      alert('Seu personagem aprendeu algo com essa experiência.')
+    }
+  }
+
+  const handleOccultEvent = (result: any) => {
+    console.log('Occult event:', result)
+    // Aqui você pode atualizar atributos ocultos
+    if (result.perceptionGained) {
+      alert('Sua percepção do oculto aumentou!')
+    }
+    if (result.spiritualResistanceGained) {
+      alert('Sua resistência espiritual aumentou!')
+    }
+  }
+
+  const handleSecretDiscovered = (secret: any) => {
+    console.log('Secret discovered:', secret)
+    alert(`Você descobriu o caminho secreto: ${secret.name}!`)
+  }
+
   if (!character.is_alive) {
     return (
       <div className="japan-border p-8 bg-japan-black">
@@ -166,17 +195,87 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
           </div>
           <div>
             <div className="text-japan-cream">Localização:</div>
-            <div className="text-japan-gold font-bold">{character.current_location}</div>
+            <div className="text-japan-gold font-bold">{character.current_location || 'Vila de origem'}</div>
           </div>
           <div>
             <div className="text-japan-cream">Status:</div>
             <div className="text-japan-gold font-bold">
               {character.is_alive ? 'Vivo' : 'Morto'}
             </div>
-          <div>Inteligência: {character.intelligence}</div>
-          <div>Carisma: {character.charisma}</div>
+          </div>
+          <div>
+            <div className="text-japan-cream">Horário:</div>
+            <div className="text-japan-gold font-bold">{gameTime}</div>
+          </div>
         </div>
+        
+        {character.travel_reason && (
+          <div className="mt-4 p-3 bg-japan-black rounded">
+            <div className="text-japan-cream text-sm">
+              <strong>Motivo da viagem:</strong> {character.travel_reason}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Navegação do Jogo */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setCurrentView('status')}
+          className={`japan-button px-4 py-2 ${currentView === 'status' ? 'bg-japan-red' : ''}`}
+        >
+          📋 Status
+        </button>
+        <button
+          onClick={() => setCurrentView('combat')}
+          className={`japan-button px-4 py-2 ${currentView === 'combat' ? 'bg-japan-red' : ''}`}
+        >
+          ⚔️ Combate
+        </button>
+        <button
+          onClick={() => setCurrentView('occult')}
+          className={`japan-button px-4 py-2 ${currentView === 'occult' ? 'bg-japan-red' : ''}`}
+        >
+          🌑 Oculto
+        </button>
+        <button
+          onClick={() => setCurrentView('secrets')}
+          className={`japan-button px-4 py-2 ${currentView === 'secrets' ? 'bg-japan-red' : ''}`}
+        >
+          🌑 Caminhos
+        </button>
+      </div>
+
+      {/* Conteúdo Baseado na View Atual */}
+      {currentView === 'status' && (
+        <div className="text-sm text-japan-cream opacity-70">
+          <p>🌅 <strong>Bem-vindo ao Japão feudal</strong></p>
+          <p>👥 <strong>Você é uma pessoa comum tentando sobreviver</strong></p>
+          <p>🗺️ <strong>O mapa mostra suas opções de viagem</strong></p>
+          <p>⚔️ <strong>Evite conflitos sempre que possível</strong></p>
+        </div>
+      )}
+
+      {currentView === 'combat' && (
+        <CombatSystem 
+          characterId={character.id} 
+          onCombatEnd={handleCombatEnd}
+        />
+      )}
+
+      {currentView === 'occult' && (
+        <OccultSystem 
+          characterId={character.id} 
+          onOccultEvent={handleOccultEvent}
+        />
+      )}
+
+      {currentView === 'secrets' && (
+        <SecretSociety 
+          characterId={character.id} 
+          onSecretDiscovered={handleSecretDiscovered}
+        />
+      )}
 
       {/* Evento Atual */}
       {currentEvent && (
