@@ -152,40 +152,27 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
   return (
     <div className="space-y-6">
       {/* Status do Personagem */}
-      <div className="character-status">
-        <h3 className="text-lg font-bold mb-4 text-japan-gold">
-          {character.name} - {character.age} anos
-        </h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-japan-gold">Ano:</span> {currentTime.currentYear}
-          </div>
-          <div>
-            <span className="text-japan-gold">Estação:</span> {GameTime.SEASON_NAMES[currentTime.currentSeason]}
-          </div>
-          <div>
-            <span className="text-japan-gold">Clã:</span> {character.clan}
-          </div>
-          <div>
-            <span className="text-japan-gold">Local:</span> {character.location}
-          </div>
-        </div>
+      <div className="character-status p-6">
+        <h3 className="text-xl font-bold mb-4 text-japan-gold">{character.name}</h3>
         
-        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
-            <span className="text-japan-gold">Saúde:</span> {character.health}/100
+            <div className="text-japan-cream">Profissão:</div>
+            <div className="text-japan-gold font-bold">{character.profession || 'Ferreiro'}</div>
           </div>
           <div>
-            <span className="text-japan-gold">Honra:</span> {character.honor}/100
+            <div className="text-japan-cream">Origem:</div>
+            <div className="text-japan-gold font-bold">{character.clan}</div>
           </div>
           <div>
-            <span className="text-japan-gold">Ouro:</span> {character.gold}
+            <div className="text-japan-cream">Localização:</div>
+            <div className="text-japan-gold font-bold">{character.current_location}</div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2 mt-4 text-xs">
-          <div>Força: {character.strength}</div>
-          <div>Agilidade: {character.agility}</div>
+          <div>
+            <div className="text-japan-cream">Status:</div>
+            <div className="text-japan-gold font-bold">
+              {character.is_alive ? 'Vivo' : 'Morto'}
+            </div>
           <div>Inteligência: {character.intelligence}</div>
           <div>Carisma: {character.charisma}</div>
         </div>
