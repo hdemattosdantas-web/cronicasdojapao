@@ -157,6 +157,11 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
     alert(`Você descobriu o caminho secreto: ${secret.name}!`)
   }
 
+  const handleCreatureEncounter = (encounter: any) => {
+    console.log('Creature encounter:', encounter)
+    alert(`Encontro anômalo: ${encounter.name}`)
+  }
+
   if (!character.is_alive) {
     return (
       <div className="japan-border p-8 bg-japan-black">
@@ -219,7 +224,7 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
       </div>
 
       {/* Navegação do Jogo */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         <button
           onClick={() => setCurrentView('status')}
           className={`japan-button px-4 py-2 ${currentView === 'status' ? 'bg-japan-red' : ''}`}
@@ -243,6 +248,12 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
           className={`japan-button px-4 py-2 ${currentView === 'secrets' ? 'bg-japan-red' : ''}`}
         >
           🌑 Caminhos
+        </button>
+        <button
+          onClick={() => setCurrentView('encounters')}
+          className={`japan-button px-4 py-2 ${currentView === 'encounters' ? 'bg-japan-red' : ''}`}
+        >
+          👁️ Encontros
         </button>
       </div>
 
@@ -274,6 +285,13 @@ export default function GameInterface({ character, onCharacterUpdate }: GameInte
         <SecretSociety 
           characterId={character.id} 
           onSecretDiscovered={handleSecretDiscovered}
+        />
+      )}
+
+      {currentView === 'encounters' && (
+        <CreatureEncounters 
+          characterId={character.id} 
+          onEncounter={handleCreatureEncounter}
         />
       )}
 
