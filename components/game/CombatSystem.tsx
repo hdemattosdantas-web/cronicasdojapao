@@ -266,5 +266,3 @@ export default function CombatSystem({ characterId, onCombatEnd }: CombatSystemP
     )
   }
 }
-
-export default CombatSystem
