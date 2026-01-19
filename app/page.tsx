@@ -14,13 +14,80 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [characterName, setCharacterName] = useState('')
-  const [characterAge, setCharacterAge] = useState('ferreiro')
+  const [characterAge, setCharacterAge] = useState(18)
+  const [characterProfession, setCharacterProfession] = useState('ferreiro')
   const [characterClan, setCharacterClan] = useState('owari')
   const [characterReason, setCharacterReason] = useState('')
   const [showCharacters, setShowCharacters] = useState(false)
   const [showFriends, setShowFriends] = useState(false)
   const [showMap, setShowMap] = useState(false)
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null)
+
+  // Função para calcular stats baseados na idade e profissão
+  const calculateStats = (age: number, profession: string) => {
+    const baseStats = {
+      strength: 10,
+      agility: 10,
+      intelligence: 10,
+      charisma: 10
+    }
+    
+    // Influência da idade
+    if (age < 25) {
+      baseStats.agility += 2
+      baseStats.strength += 1
+    } else if (age < 40) {
+      baseStats.strength += 3
+      baseStats.charisma += 1
+    } else if (age < 55) {
+      baseStats.intelligence += 2
+      baseStats.charisma += 2
+    } else {
+      baseStats.intelligence += 3
+      baseStats.charisma += 1
+    }
+    
+    // Influência da profissão
+    switch (profession) {
+      case 'ferreiro':
+        baseStats.strength += 2
+        baseStats.intelligence += 1
+        break
+      case 'campones':
+        baseStats.strength += 1
+        baseStats.agility += 1
+        break
+      case 'mensageiro':
+        baseStats.agility += 3
+        baseStats.charisma += 1
+        break
+      case 'monge_novico':
+        baseStats.intelligence += 2
+        baseStats.charisma += 1
+        break
+      case 'ronin':
+        baseStats.strength += 2
+        baseStats.agility += 2
+        baseStats.charisma -= 1
+        break
+      case 'artesao':
+        baseStats.intelligence += 2
+        baseStats.agility += 1
+        break
+      case 'comerciante':
+        baseStats.charisma += 3
+        baseStats.intelligence += 1
+        break
+    }
+    
+    // Garantir valores mínimos e máximos
+    return {
+      strength: Math.max(5, Math.min(20, baseStats.strength)),
+      agility: Math.max(5, Math.min(20, baseStats.agility)),
+      intelligence: Math.max(5, Math.min(20, baseStats.intelligence)),
+      charisma: Math.max(5, Math.min(20, baseStats.charisma))
+    }
+  }
 
   useEffect(() => {
     const getUser = async () => {
@@ -76,7 +143,8 @@ export default function Home() {
       alert('Personagem criado com sucesso!')
       // Resetar formulário
       setCharacterName('')
-      setCharacterAge('ferreiro')
+      setCharacterAge(18)
+      setCharacterProfession('ferreiro')
       setCharacterClan('owari')
       setCharacterReason('')
       // Ir para lista de personagens
@@ -283,6 +351,22 @@ export default function Home() {
                 </div>
                 
                 <div>
+                  <label className="block text-sm font-medium mb-2">Idade (18+ anos):</label>
+                  <input 
+                    type="number"
+                    min="18"
+                    max="80"
+                    value={characterAge}
+                    onChange={(e) => setCharacterAge(parseInt(e.target.value) || 18)}
+                    className="w-full p-2 japan-input text-japan-cream"
+                    placeholder="18"
+                  />
+                  <div className="text-xs text-japan-cream opacity-70 mt-1">
+                    A idade influencia seus atributos físicos e mentais
+                  </div>
+                </div>
+                
+                <div>
                   <label className="block text-sm font-medium mb-2">Origem (Província):</label>
                   <select 
                     value={characterClan}
@@ -301,14 +385,14 @@ export default function Home() {
                 <div>
                   <label className="block text-sm font-medium mb-2">Profissão:</label>
                   <select 
-                    value={characterAge}
-                    onChange={(e) => setCharacterAge(e.target.value)}
+                    value={characterProfession}
+                    onChange={(e) => setCharacterProfession(e.target.value)}
                     className="w-full p-2 japan-input text-japan-cream"
                   >
                     <option value="ferreiro">Ferreiro</option>
                     <option value="campones">Camponês</option>
                     <option value="mensageiro">Mensageiro</option>
-                    <option value="monge">Monge noviço</option>
+                    <option value="monge_novico">Monge Noviço</option>
                     <option value="ronin">Ronin</option>
                     <option value="artesao">Artesão</option>
                     <option value="comerciante">Comerciante</option>
@@ -316,20 +400,38 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Motivo da viagem / mudança:</label>
+                  <label className="block text-sm font-medium mb-2">Motivo da Viagem:</label>
                   <textarea 
-                    value={characterName}
-                    onChange={(e) => setCharacterName(e.target.value)}
-                    className="w-full p-2 japan-input text-japan-cream"
-                    placeholder="Ex: Perdi a oficina em um incêndio e precisei me mudar..."
-                    rows={3}
+                    value={characterReason}
+                    onChange={(e) => setCharacterReason(e.target.value)}
+                    className="w-full p-2 japan-input text-japan-cream h-24"
+                    placeholder="Por que você deixou sua terra natal? O que te traz a esta jornada?"
                   />
+                  <div className="text-xs text-japan-cream opacity-70 mt-1">
+                    Sua história define quem você é e influencia suas habilidades
+                  </div>
                 </div>
 
-                <div className="text-sm text-japan-cream opacity-70">
-                  <p className="mb-2">📝 <strong>Seu personagem é um humano comum</strong>, sem poderes especiais ou destino épico.</p>
-                  <p className="mb-2">🎭 <strong>Seus atributos serão definidos por suas escolhas</strong> durante o questionário narrativo.</p>
-                  <p>⚔️ <strong>Combate é raro e perigoso</strong> - fugir sempre é uma opção válida.</p>
+                {/* Preview de Stats */}
+                <div className="p-3 bg-japan-black rounded">
+                  <h3 className="text-sm font-bold mb-2 text-japan-gold">Atributos Previstos:</h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-japan-cream">
+                    <div>Força: {calculateStats(characterAge, characterProfession).strength}</div>
+                    <div>Agilidade: {calculateStats(characterAge, characterProfession).agility}</div>
+                    <div>Inteligência: {calculateStats(characterAge, characterProfession).intelligence}</div>
+                    <div>Carisma: {calculateStats(characterAge, characterProfession).charisma}</div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={createCharacter}
+                  className="japan-button w-full py-3 text-lg font-bold"
+                  disabled={!characterName || !characterClan || !characterProfession || !characterReason}
+                >
+                  Criar Personagem
+                </button>
+              </div>
+            </div>
                 </div>
 
                 <button 
@@ -345,6 +447,7 @@ export default function Home() {
       </div>
     )
   }
+}
 
   if (showCharacters) {
     return (
