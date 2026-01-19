@@ -6,6 +6,7 @@ import AuthButton from '@/components/auth/AuthButton'
 import CharacterList from '@/components/game/CharacterList'
 import FriendsList from '@/components/friends/FriendsList'
 import GameMap from '@/components/game/GameMap'
+import CustomButton from '@/components/ui/CustomButton'
 import { ensureUserProfile } from '@/lib/auth/profile'
 
 export default function Home() {
@@ -148,16 +149,15 @@ export default function Home() {
 
             {/* Call to Action */}
             <div className="space-y-6 max-w-md mx-auto">
-              <button 
+              <CustomButton
                 onClick={() => {
                   console.log('Botão Entrar clicado');
                   setGameStarted(true);
                 }}
-                className="japan-button text-2xl px-16 py-8 w-full font-bold cursor-pointer hover:scale-105 transition-transform"
-                style={{ pointerEvents: 'auto' }}
+                className="text-2xl px-16 py-8 w-full font-bold"
               >
                 🚪 Entrar
-              </button>
+              </CustomButton>
               
               <div className="samurai-divider"></div>
               
