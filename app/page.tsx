@@ -14,8 +14,9 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [characterName, setCharacterName] = useState('')
-  const [characterAge, setCharacterAge] = useState('16')
+  const [characterAge, setCharacterAge] = useState('ferreiro')
   const [characterClan, setCharacterClan] = useState('owari')
+  const [characterReason, setCharacterReason] = useState('')
   const [showCharacters, setShowCharacters] = useState(false)
   const [showFriends, setShowFriends] = useState(false)
   const [showMap, setShowMap] = useState(false)
@@ -59,16 +60,28 @@ export default function Home() {
       .insert({
         user_id: user.id,
         name: characterName,
-        age: parseInt(characterAge),
-        clan: characterClan,
+        age: 16, // Idade fixa para humanos comuns
+        clan: characterClan, // Origem/província
+        profession: characterAge, // Profissão atual
+        travel_reason: characterReason, // Motivo da viagem
+        current_location: 'Vila de origem', // Localização inicial
+        is_alive: true,
+        honor: 50, // Valor neutro para humanos comuns
+        created_at: new Date().toISOString()
       })
 
     if (error) {
       alert('Erro ao criar personagem: ' + error.message)
     } else {
       alert('Personagem criado com sucesso!')
+      // Resetar formulário
       setCharacterName('')
+      setCharacterAge('ferreiro')
+      setCharacterClan('owari')
+      setCharacterReason('')
+      // Ir para lista de personagens
       setShowCharacters(true)
+      setGameStarted(false)
     }
   }
 
@@ -268,21 +281,9 @@ export default function Home() {
                     placeholder="Digite seu nome..."
                   />
                 </div>
+                
                 <div>
-                  <label className="block text-sm font-medium mb-2">Idade:</label>
-                  <select 
-                    value={characterAge}
-                    onChange={(e) => setCharacterAge(e.target.value)}
-                    className="w-full p-2 japan-input text-japan-cream"
-                  >
-                    <option value="16">16 anos</option>
-                    <option value="18">18 anos</option>
-                    <option value="20">20 anos</option>
-                    <option value="25">25 anos</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Origem:</label>
+                  <label className="block text-sm font-medium mb-2">Origem (Província):</label>
                   <select 
                     value={characterClan}
                     onChange={(e) => setCharacterClan(e.target.value)}
@@ -296,6 +297,41 @@ export default function Home() {
                     <option value="echigo">Echigo - Norte</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Profissão:</label>
+                  <select 
+                    value={characterAge}
+                    onChange={(e) => setCharacterAge(e.target.value)}
+                    className="w-full p-2 japan-input text-japan-cream"
+                  >
+                    <option value="ferreiro">Ferreiro</option>
+                    <option value="campones">Camponês</option>
+                    <option value="mensageiro">Mensageiro</option>
+                    <option value="monge">Monge noviço</option>
+                    <option value="ronin">Ronin</option>
+                    <option value="artesao">Artesão</option>
+                    <option value="comerciante">Comerciante</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Motivo da viagem / mudança:</label>
+                  <textarea 
+                    value={characterName}
+                    onChange={(e) => setCharacterName(e.target.value)}
+                    className="w-full p-2 japan-input text-japan-cream"
+                    placeholder="Ex: Perdi a oficina em um incêndio e precisei me mudar..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="text-sm text-japan-cream opacity-70">
+                  <p className="mb-2">📝 <strong>Seu personagem é um humano comum</strong>, sem poderes especiais ou destino épico.</p>
+                  <p className="mb-2">🎭 <strong>Seus atributos serão definidos por suas escolhas</strong> durante o questionário narrativo.</p>
+                  <p>⚔️ <strong>Combate é raro e perigoso</strong> - fugir sempre é uma opção válida.</p>
+                </div>
+
                 <button 
                   onClick={createCharacter}
                   className="japan-button w-full"
