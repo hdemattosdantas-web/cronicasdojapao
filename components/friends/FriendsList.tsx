@@ -65,7 +65,20 @@ export default function FriendsList({ userId }: { userId: string }) {
       .eq('user_id', userId)
 
     if (data && !error) {
-      setFriends(data.map(item => item.profiles))
+      const validProfiles = data
+        .map(item => item.profiles)
+        .filter((profile): profile is NonNullable<typeof profile> => profile !== null)
+        .map((profile): Friend => {
+          const p = profile as any
+          return {
+            id: p.id,
+            username: p.username,
+            full_name: p.full_name,
+            is_online: p.is_online,
+            last_seen: p.last_seen
+          }
+        })
+      setFriends(validProfiles)
     }
     setLoading(false)
   }
@@ -83,7 +96,14 @@ export default function FriendsList({ userId }: { userId: string }) {
       .eq('status', 'pending')
 
     if (data && !error) {
-      setFriendRequests(data)
+      const validRequests = data.map((request): FriendRequest => ({
+        id: request.id,
+        sender_id: request.sender_id,
+        receiver_id: userId, // Adicionando receiver_id que estava faltando
+        sender_username: request.sender_username,
+        created_at: request.created_at
+      }))
+      setFriendRequests(validRequests)
     }
   }
 

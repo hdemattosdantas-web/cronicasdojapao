@@ -144,8 +144,10 @@ export default function CombatSystem({ characterId, onCombatEnd }: CombatSystemP
 
   // Simular combate automático para teste
   useEffect(() => {
+    let timer: NodeJS.Timeout | null = null
+    
     if (inCombat && currentEnemy) {
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         // Simular resultado baseado em dificuldade
         const playerWinChance = 0.6 - (currentEnemy.difficulty * 0.05)
         const playerWins = Math.random() < playerWinChance
@@ -158,11 +160,11 @@ export default function CombatSystem({ characterId, onCombatEnd }: CombatSystemP
           gainsExperience
         )
       }, 3000)
-      
-      return () => clearTimeout(timer)
     }
     
-    return () => clearTimeout(timer)
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
   }, [inCombat, currentEnemy])
 
   if (inCombat) {
@@ -236,30 +238,33 @@ export default function CombatSystem({ characterId, onCombatEnd }: CombatSystemP
       </div>
       
       <div className="space-y-3">
-        {commonEnemies.map(enemy => (
-          <div key={enemy.id} className="p-3 bg-japan-black rounded">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <div className="text-japan-cream font-bold">
-                  {enemy.name}
+          {commonEnemies.map(enemy => (
+            <div key={enemy.id} className="p-3 bg-japan-black rounded">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="text-japan-cream font-bold">
+                    {enemy.name}
+                  </div>
+                  <div className="text-japan-cream text-sm opacity-80">
+                    {enemy.description}
+                  </div>
+                  <div className="text-japan-cream text-xs mt-1">
+                    Dificuldade: {'⭐'.repeat(Math.ceil(enemy.difficulty / 2))}
+                  </div>
                 </div>
-                <div className="text-japan-cream text-sm opacity-80">
-                  {enemy.description}
-                </div>
-                <div className="text-japan-cream text-xs mt-1">
-                  Dificuldade: {'⭐'.repeat(Math.ceil(enemy.difficulty / 2))}
-                </div>
+                <button
+                  onClick={() => startCombat(enemy)}
+                  className="japan-button px-3 py-2 text-sm"
+                >
+                  ⚔️ Enfrentar
+                </button>
               </div>
-              <button
-                onClick={() => startCombat(enemy)}
-                className="japan-button px-3 py-2 text-sm"
-              >
-                ⚔️ Enfrentar
-              </button>
             </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
-}
+
+export default CombatSystem
