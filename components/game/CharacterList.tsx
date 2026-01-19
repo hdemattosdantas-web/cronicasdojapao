@@ -5,7 +5,12 @@ import { supabase } from '@/lib/supabase'
 import { Character } from '@/types/character'
 import GameInterface from './GameInterface'
 
-export default function CharacterList({ userId }: { userId: string }) {
+interface CharacterListProps {
+  userId: string
+  onSelectCharacter?: (character: any) => void
+}
+
+export default function CharacterList({ userId, onSelectCharacter }: CharacterListProps) {
   const [characters, setCharacters] = useState<Character[]>([])
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
   const [loading, setLoading] = useState(true)
@@ -102,7 +107,7 @@ export default function CharacterList({ userId }: { userId: string }) {
                       <span className="text-japan-gold">Idade:</span> {character.age} anos
                     </div>
                     <div>
-                      <span className="text-japan-gold">Clã:</span> {character.clan}
+                      <span className="text-japan-gold">Origem:</span> {character.clan}
                     </div>
                     <div>
                       <span className="text-japan-gold">Status:</span> {character.is_alive ? 'Vivo' : 'Morto'}
@@ -120,6 +125,14 @@ export default function CharacterList({ userId }: { userId: string }) {
                 </div>
                 
                 <div className="flex gap-2">
+                  {onSelectCharacter && (
+                    <button
+                      onClick={() => onSelectCharacter(character)}
+                      className="japan-button px-4 py-2 text-sm"
+                    >
+                      🗺️ Mapa
+                    </button>
+                  )}
                   <button
                     onClick={() => setSelectedCharacter(character)}
                     className="japan-button px-4 py-2"

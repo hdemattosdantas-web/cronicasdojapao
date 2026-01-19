@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import AuthButton from '@/components/auth/AuthButton'
 import CharacterList from '@/components/game/CharacterList'
+import FriendsList from '@/components/friends/FriendsList'
+import GameMap from '@/components/game/GameMap'
 import { ensureUserProfile } from '@/lib/auth/profile'
 
 export default function Home() {
@@ -12,8 +14,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [characterName, setCharacterName] = useState('')
   const [characterAge, setCharacterAge] = useState('16')
-  const [characterClan, setCharacterClan] = useState('oda')
+  const [characterClan, setCharacterClan] = useState('owari')
   const [showCharacters, setShowCharacters] = useState(false)
+  const [showFriends, setShowFriends] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [selectedCharacter, setSelectedCharacter] = useState<any>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -144,8 +149,12 @@ export default function Home() {
             {/* Call to Action */}
             <div className="space-y-6 max-w-md mx-auto">
               <button 
-                onClick={() => setGameStarted(true)}
-                className="japan-button text-2xl px-16 py-8 w-full font-bold"
+                onClick={() => {
+                  console.log('Botão Entrar clicado');
+                  setGameStarted(true);
+                }}
+                className="japan-button text-2xl px-16 py-8 w-full font-bold cursor-pointer hover:scale-105 transition-transform"
+                style={{ pointerEvents: 'auto' }}
               >
                 🚪 Entrar
               </button>
@@ -165,21 +174,21 @@ export default function Home() {
     )
   }
 
-  if (showCharacters) {
+  if (showFriends) {
     return (
       <div className="min-h-screen p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="japan-border p-6 bg-japan-black mb-6">
+          <div className="japan-card p-6 mb-6">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-japan-red">
-                Crônicas do Japão
+                👥 Amigos
               </h1>
               <div className="flex gap-4">
                 <button
-                  onClick={() => setShowCharacters(false)}
+                  onClick={() => setShowFriends(false)}
                   className="japan-button"
                 >
-                  Novo Personagem
+                  Voltar
                 </button>
                 <button 
                   onClick={() => supabase.auth.signOut()}
@@ -190,7 +199,38 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <CharacterList userId={user.id} />
+          <FriendsList userId={user.id} />
+        </div>
+      </div>
+    )
+  }
+
+  if (showMap && selectedCharacter) {
+    return (
+      <div className="min-h-screen p-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="japan-card p-6 mb-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold text-japan-red">
+                🗺️ Mapa - {selectedCharacter.name}
+              </h1>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowMap(false)}
+                  className="japan-button"
+                >
+                  Voltar
+                </button>
+                <button 
+                  onClick={() => supabase.auth.signOut()}
+                  className="text-sm text-japan-cream hover:text-japan-gold transition-colors"
+                >
+                  Sair ({user.email})
+                </button>
+              </div>
+            </div>
+          </div>
+          <GameMap characterId={selectedCharacter.id} />
         </div>
       </div>
     )
@@ -270,46 +310,46 @@ export default function Home() {
     )
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
-        <div className="japan-border p-8 bg-japan-black text-center">
-          <h1 className="text-5xl font-bold mb-4 text-japan-red">
-            🏯 Crônicas do Japão
-          </h1>
-          <p className="text-xl mb-8 text-japan-cream">
-            RPG de Vida • Japão Sengoku
-          </p>
-          <div className="text-scene mb-8">
-            <p className="mb-4">
-              Bem-vindo ao Japão feudal, onde samurais, honra e destino se encontram.
-            </p>
-            <p>
-              Viva uma vida completa no período mais turbulento da história japonesa.
-            </p>
+  if (showCharacters) {
+    return (
+      <div className="min-h-screen p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="japan-card p-6 mb-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold text-japan-red">
+                Crônicas do Japão
+              </h1>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowFriends(true)}
+                  className="japan-button"
+                >
+                  👥 Amigos
+                </button>
+                <button
+                  onClick={() => setShowCharacters(false)}
+                  className="japan-button"
+                >
+                  Novo Personagem
+                </button>
+                <button 
+                  onClick={() => supabase.auth.signOut()}
+                  className="text-sm text-japan-cream hover:text-japan-gold transition-colors"
+                >
+                  Sair ({user.email})
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="space-y-4">
-            <button 
-              onClick={() => setGameStarted(true)}
-              className="japan-button text-lg px-8 py-4 w-full"
-            >
-              🚪 Começar Aventura
-            </button>
-            <button 
-              onClick={() => setShowCharacters(true)}
-              className="japan-button text-lg px-8 py-4 w-full"
-            >
-              👥 Meus Personagens
-            </button>
-            <button 
-              onClick={() => supabase.auth.signOut()}
-              className="w-full text-sm text-japan-cream hover:text-japan-gold transition-colors"
-            >
-              Sair ({user.email})
-            </button>
-          </div>
+          <CharacterList 
+            userId={user.id} 
+            onSelectCharacter={(character) => {
+              setSelectedCharacter(character)
+              setShowMap(true)
+            }}
+          />
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
