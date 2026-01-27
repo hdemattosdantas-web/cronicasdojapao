@@ -98,12 +98,19 @@ ALTER TABLE game_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE character_decisions ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de segurança
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Users can view own characters" ON characters FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own characters" ON characters FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own characters" ON characters FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view own characters" ON characters;
+DROP POLICY IF EXISTS "Users can insert own characters" ON characters;
+DROP POLICY IF EXISTS "Users can update own characters" ON characters;
+DROP POLICY IF EXISTS "Users can delete own characters" ON characters;
+CREATE POLICY "Users can view own characters" ON characters FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users can insert own characters" ON characters FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Users can update own characters" ON characters FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "Users can delete own characters" ON characters FOR DELETE USING (user_id = auth.uid());
 
 CREATE POLICY "Users can view own relationships" ON character_relationships FOR SELECT USING (
   EXISTS (SELECT 1 FROM characters WHERE id = character_id AND user_id = auth.uid())

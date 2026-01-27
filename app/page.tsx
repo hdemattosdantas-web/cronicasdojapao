@@ -432,22 +432,11 @@ export default function Home() {
                 </button>
               </div>
             </div>
-                </div>
-
-                <button 
-                  onClick={createCharacter}
-                  className="japan-button w-full"
-                >
-                  Criar Personagem
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     )
   }
-}
 
   if (showCharacters) {
     return (

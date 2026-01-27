@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Character } from '@/types/character'
-import GameInterface from './GameInterface'
 
 interface CharacterListProps {
   userId: string
@@ -20,131 +19,78 @@ export default function CharacterList({ userId, onSelectCharacter }: CharacterLi
   }, [userId])
 
   const loadCharacters = async () => {
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await supabase
+        .from('characters')
+        .select('*')
+        .eq('user_id', userId)
 
-    if (error) {
-      console.error('Erro ao carregar personagens:', error)
-    } else {
+      if (error) throw error
       setCharacters(data || [])
+    } catch (error) {
+      console.error('Erro ao carregar personagens:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
-  const handleCharacterUpdate = (updatedCharacter: Character) => {
-    setCharacters(prev => 
-      prev.map(char => char.id === updatedCharacter.id ? updatedCharacter : char)
-    )
-    setSelectedCharacter(updatedCharacter)
-  }
-
-  const deleteCharacter = async (characterId: string) => {
-    if (!confirm('Tem certeza que deseja deletar este personagem?')) return
-
-    const { error } = await supabase
-      .from('characters')
-      .delete()
-      .eq('id', characterId)
-
-    if (error) {
-      alert('Erro ao deletar personagem: ' + error.message)
-    } else {
-      setCharacters(prev => prev.filter(char => char.id !== characterId))
-      if (selectedCharacter?.id === characterId) {
-        setSelectedCharacter(null)
-      }
+  const handleSelectCharacter = (character: Character) => {
+    setSelectedCharacter(character)
+    if (onSelectCharacter) {
+      onSelectCharacter(character)
     }
   }
 
   if (loading) {
-    return <div className="text-japan-cream">Carregando personagens...</div>
-  }
-
-  if (selectedCharacter) {
     return (
-      <div>
-        <button
-          onClick={() => setSelectedCharacter(null)}
-          className="japan-button mb-4"
-        >
-          ← Voltar para Personagens
-        </button>
-        <GameInterface 
-          character={selectedCharacter} 
-          onCharacterUpdate={handleCharacterUpdate}
-        />
+      <div className="flex justify-center items-center p-8">
+        <div className="text-japan-cream">Carregando personagens...</div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-japan-red">Seus Personagens</h2>
+    <div className="space-y-4">
+      <h3 className="text-xl font-bold text-japan-gold">Seus Personagens</h3>
       
       {characters.length === 0 ? (
-        <div className="japan-border p-8 bg-japan-black text-center">
-          <p className="text-japan-cream mb-4">
-            Você ainda não tem personagens criados.
-          </p>
-          <p className="text-japan-cream">
-            Volte para a página inicial e crie seu primeiro personagem!
-          </p>
+        <div className="text-center p-8 bg-japan-black rounded">
+          <div className="text-japan-cream mb-4">
+            Nenhum personagem encontrado. Crie seu primeiro personagem!
+          </div>
         </div>
       ) : (
         <div className="grid gap-4">
           {characters.map((character) => (
-            <div key={character.id} className="japan-border p-6 bg-japan-black">
+            <div
+              key={character.id}
+              onClick={() => handleSelectCharacter(character)}
+              className={`p-4 bg-japan-black rounded cursor-pointer border transition-all ${
+                selectedCharacter?.id === character.id
+                  ? 'border-japan-gold'
+                  : 'border-japan-cream hover:border-japan-gold'
+              }`}
+            >
               <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-japan-gold mb-2">
-                    {character.name}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm text-japan-cream">
-                    <div>
-                      <span className="text-japan-gold">Idade:</span> {character.age} anos
-                    </div>
-                    <div>
-                      <span className="text-japan-gold">Origem:</span> {character.clan}
-                    </div>
-                    <div>
-                      <span className="text-japan-gold">Status:</span> {character.is_alive ? 'Vivo' : 'Morto'}
-                    </div>
-                    <div>
-                      <span className="text-japan-gold">Honra:</span> {character.honor}
-                    </div>
+                <div>
+                  <h4 className="font-bold text-japan-gold">{character.name}</h4>
+                  <div className="text-japan-cream text-sm">
+                    Clã: {character.clan}
                   </div>
-                  
-                  {!character.is_alive && (
-                    <div className="mt-2 text-sm text-japan-red">
-                      Causa da morte: {character.death_reason || 'Desconhecida'}
-                    </div>
-                  )}
+                  <div className="text-japan-cream text-sm">
+                    Idade: {character.age || 'Desconhecida'}
+                  </div>
                 </div>
-                
-                <div className="flex gap-2">
-                  {onSelectCharacter && (
-                    <button
-                      onClick={() => onSelectCharacter(character)}
-                      className="japan-button px-4 py-2 text-sm"
-                    >
-                      🗺️ Mapa
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setSelectedCharacter(character)}
-                    className="japan-button px-4 py-2"
-                  >
-                    {character.is_alive ? 'Jogar' : 'Ver História'}
-                  </button>
-                  <button
-                    onClick={() => deleteCharacter(character.id)}
-                    className="px-4 py-2 border border-japan-red text-japan-red hover:bg-japan-red hover:text-japan-cream transition-colors"
-                  >
-                    Deletar
-                  </button>
+                <div className="text-right">
+                  <div className="text-japan-cream text-sm">
+                    Saúde: {character.health}
+                  </div>
+                  <div className="text-japan-cream text-sm">
+                    Honra: {character.honor}
+                  </div>
+                  <div className="text-japan-cream text-sm">
+                    Ouro: {character.gold}
+                  </div>
                 </div>
               </div>
             </div>

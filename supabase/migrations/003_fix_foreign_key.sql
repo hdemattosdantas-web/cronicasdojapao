@@ -13,8 +13,22 @@ DELETE FROM characters WHERE user_id NOT IN (SELECT id FROM profiles);
 INSERT INTO profiles (id, username, full_name)
 SELECT 
     id,
-    COALESCE(raw_user_meta_data->>'username', email->>'email', 'user_' || left(id::text, 8)) as username,
-    COALESCE(raw_user_meta_data->>'full_name', raw_user_meta_data->>'username', email->>'email', 'Usuário') as full_name
+    COALESCE(
+        CASE 
+            WHEN jsonb_typeof(raw_user_meta_data->'username') = 'string' 
+            THEN raw_user_meta_data->>'username' 
+            ELSE NULL 
+        END,
+        'user_' || left(id::text, 8)
+    ),
+    COALESCE(
+        CASE 
+            WHEN jsonb_typeof(raw_user_meta_data->'full_name') = 'string' 
+            THEN raw_user_meta_data->>'full_name' 
+            ELSE NULL 
+        END,
+        'Novo Usuário'
+    )
 FROM auth.users 
 WHERE id NOT IN (SELECT id FROM profiles);
 
@@ -25,13 +39,29 @@ BEGIN
   INSERT INTO public.profiles (id, username, full_name)
   VALUES (
     new.id,
-    COALESCE(new.raw_user_meta_data->>'username', new.email::text),
-    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'username', new.email::text)
+    COALESCE(
+        CASE 
+            WHEN jsonb_typeof(new.raw_user_meta_data->'username') = 'string' 
+            THEN new.raw_user_meta_data->>'username' 
+            ELSE NULL 
+        END,
+        'user_' || left(new.id::text, 8)
+    ),
+    COALESCE(
+        CASE 
+            WHEN jsonb_typeof(new.raw_user_meta_data->'full_name') = 'string' 
+            THEN new.raw_user_meta_data->>'full_name' 
+            ELSE NULL 
+        END,
+        'Novo Usuário'
+    )
   );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- Trigger para criar perfil automaticamente (já existe na 003)
+-- DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+-- CREATE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
